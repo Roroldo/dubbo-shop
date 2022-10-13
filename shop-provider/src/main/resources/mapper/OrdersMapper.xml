@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.topband.shop.provider.mapper.OrdersMapper">
+    <resultMap id="baseMap" type="com.topband.shop.view.OrdersVO">
+        <id property="id" column="orderId"/>
+        <result property="orderPrice" column="order_price"/>
+        <result property="userEmail" column="email"/>
+        <result property="voucherName" column="voucherName"/>
+        <result property="goodsName" column="goodsName"/>
+        <result property="createTime" column="create_time"/>
+    </resultMap>
+
+    <insert id="save" parameterType="com.topband.shop.entity.Orders">
+        insert into hyj_order(id, user_id, voucher_id, goods_id, order_price, create_time, update_time)
+            value (#{id}, #{userId}, #{voucherId}, #{goodsId}, #{orderPrice}, #{createTime}, #{updateTime})
+    </insert>
+
+    <select id="countByUserIdAndVoucherId" resultType="java.lang.Integer">
+        select count(*)
+        from hyj_order
+        where user_id = #{userId}
+          and voucher_id = #{voucherId}
+          and del_flag = 0
+    </select>
+
+    <select id="list" resultMap="baseMap">
+        select ho.id as orderId, ho.order_price, ho.create_time, hg.name as goodsName, hv.name as voucherName, hu.email
+        from hyj_order ho
+                 left join hyj_user hu on ho.user_id = hu.id
+                 left join hyj_goods hg on ho.goods_id = hg.id
+                 left join hyj_voucher hv on ho.voucher_id = hv.id
+        <where>
+            <if test="start != null">
+                ho.create_time >= #{start}
+            </if>
+            <if test="end != null">
+                and ho.create_time <![CDATA[<=]]> #{end}
+            </if>
+            and ho.del_flag = 0
+        </where>
+    </select>
+
+    <select id="listManual" resultMap="baseMap">
+        select ho.id as orderId, ho.order_price, ho.create_time, hg.name as goodsName, hv.name as voucherName, hu.email
+        from hyj_order ho
+        left join hyj_user hu on ho.user_id = hu.id
+        left join hyj_goods hg on ho.goods_id = hg.id
+        left join hyj_voucher hv on ho.voucher_id = hv.id
+        <where>
+            <if test="start != null">
+                ho.create_time >= #{start}
+            </if>
+            <if test="end != null">
+                and ho.create_time <![CDATA[<=]]> #{end}
+            </if>
+            and ho.del_flag = 0
+        </where>
+        limit #{startIndex}, #{endIndex}
+    </select>
+
+    <select id="countByGoodsId" resultType="java.lang.Integer">
+        select count(*) from hyj_order where goods_id = #{goodsId} and del_flag = 0
+    </select>
+</mapper>

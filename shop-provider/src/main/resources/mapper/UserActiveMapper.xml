@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.topband.shop.provider.mapper.UserActiveMapper">
+    <insert id="save" parameterType="com.topband.shop.entity.UserActive">
+        insert into hyj_user_active(id, user_id, active_time, create_time, update_time)
+                value (#{id}, #{userId}, #{activateTime}, #{createTime}, #{updateTime})
+    </insert>
+
+    <select id="countActiveByDate" resultType="com.topband.shop.view.UserActiveVO">
+        select date_format(active_time, '%Y-%m-%d') as date, count(distinct user_id) as count
+        from hyj_user_active
+        where del_flag = 0
+          and DATE_SUB(CURDATE(), INTERVAL #{day} DAY) &lt;= date_format(create_time, '%Y-%m-%d')
+        group by date
+        order by date
+    </select>
+
+    <select id="countNewByDate" resultType="com.topband.shop.view.UserActiveVO">
+        select date_format(create_time, '%Y-%m-%d') as date, count(distinct id) as count
+        from hyj_user
+        where del_flag = 0
+          and DATE_SUB(CURDATE(), INTERVAL #{day} DAY) &lt;= date_format(create_time, '%Y-%m-%d')
+        group by date
+        order by date
+    </select>
+</mapper>

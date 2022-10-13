@@ -1,0 +1,46 @@
+server:
+  port: 7375
+
+logging:
+  config: classpath:logs/logback.xml
+
+spring:
+  servlet:
+    multipart:
+      enabled: true
+      max-file-size: 100MB
+      max-request-size: 100MB
+  logstash:
+    addr: 192.168.26.166.5044
+  redis:
+    cluster:
+      nodes:
+        - 192.168.26.119:7000
+        - 192.168.26.119:7001
+        - 192.168.26.120:7000
+        - 192.168.26.120:7001
+        - 192.168.26.121:7000
+        - 192.168.26.121:7001
+    ssl: false
+    password: redisBNH76@#y
+    database: 0
+    lettuce:
+      pool:
+        max-active: 16
+        max-idle: 16
+        max-wait: -1ms
+        min-idle: 0
+  rabbitmq:
+    addresses: 192.168.26.119:5672,192.168.26.120:5672,192.168.26.121:5672
+    username: guest
+    password: guestYUH6@#
+    host: /
+
+dubbo:
+  registry:
+    address: zookeeper://192.168.26.119:2181?backup=192.168.26.120:2181,192.168.26.121:2181
+  application:
+    name: hyj-shop-consumer-app
+  consumer:
+    check: false
+    timeout: 10000

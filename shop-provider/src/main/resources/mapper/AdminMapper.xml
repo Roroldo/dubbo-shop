@@ -1,0 +1,129 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.topband.shop.provider.mapper.AdminMapper">
+    <resultMap id="BaseResultMap" type="com.topband.shop.entity.Admin">
+        <result column="id" property="id"/>
+        <result column="name" property="name"/>
+        <result column="email" property="email"/>
+        <result column="password" property="password"/>
+        <result column="type" property="type"/>
+        <result column="status" property="status"/>
+        <result column="create_time" property="createTime"/>
+        <result column="update_time" property="updateTime"/>
+        <result column="del_flag" property="delFlag"/>
+    </resultMap>
+    <sql id="baseAdminCol">
+        id
+        , `name`, email, password, `type`, status, create_time, update_time, del_flag
+    </sql>
+
+    <insert id="save">
+        insert into hyj_admin(id, `name`, email, password, create_time, update_time)
+            value (#{id}, #{name}, #{email}, #{password}, #{createTime}, #{updateTime})
+    </insert>
+
+    <update id="updatePasswordByEmail">
+        update hyj_admin
+        set password = #{newPassword}, update_time = #{updateTime}
+        where del_flag = 0
+          and email = #{email}
+    </update>
+
+    <update id="updateNameOrEmailById">
+        update hyj_admin
+        <set>
+            update_time = #{updateTime},
+            <if test="email != null and email != ''">
+                email = #{email},
+            </if>
+            <if test="name != null and name != ''">
+                `name` = #{name}
+            </if>
+        </set>
+        where id = #{id}
+    </update>
+
+    <update id="deleteById">
+        update hyj_admin
+        set del_flag    = 1,
+            update_time = #{updateTime}
+        where id = #{adminId}
+    </update>
+
+    <update id="updateStatusById">
+        update hyj_admin
+        set status      = #{status},
+            update_time = #{updateTime}
+        where id = #{adminId}
+    </update>
+
+    <select id="selectByEmail" resultType="com.topband.shop.entity.Admin">
+        select
+        <include refid="baseAdminCol"/>
+        from hyj_admin where del_flag = 0 and email = #{email}
+    </select>
+
+    <select id="selectById" resultType="com.topband.shop.entity.Admin">
+        select
+        <include refid="baseAdminCol"/>
+        from hyj_admin where del_flag = 0 and id = #{userId}
+    </select>
+
+    <select id="countNotRepeatNameOrEmailById" resultType="java.lang.Integer">
+        select count(*)
+        from hyj_admin
+        <where>
+            <if test="email != null and email != ''">
+                email = #{email}
+            </if>
+            <if test="name != null and name != ''">
+                or name = #{name}
+            </if>
+            and (id != #{id} and del_flag = 0)
+        </where>
+    </select>
+
+    <resultMap id="baseAdminVO" type="com.topband.shop.view.AdminVO">
+        <id column="id" property="id"/>
+        <result column="name" property="name"/>
+        <result column="email" property="email"/>
+        <result column="create_time" property="createTime"/>
+        <result column="status" property="status"/>
+        <result column="roleName" property="roleName"/>
+    </resultMap>
+
+    <select id="list" resultMap="baseAdminVO">
+        select ha.id,
+        ha.name,
+        ha.email,
+        ha.create_time,
+        (case ha.status when 0 then '正常' when 1 then '冻结' end) as status,
+        hr.name as roleName
+        from hyj_admin ha
+        left join hyj_admin_role har on ha.id = har.admin_id
+        left join hyj_role hr on har.role_id = hr.id
+        <where>
+            <if test="name != null and name !=''">
+                ha.name like concat('%', #{name}, '%')
+            </if>
+            <if test="email != null and email !=''">
+                and ha.email like concat('%', #{email}, '%')
+            </if>
+        </where>
+        order by ha.type desc, ha.create_time desc
+    </select>
+
+    <select id="countNotRepeatName" resultType="java.lang.Integer">
+        select count(*)
+        from hyj_admin
+        where name = #{name}
+          and del_flag = 0
+    </select>
+
+    <select id="countNotRepeatEmail" resultType="java.lang.Integer">
+        select count(*)
+        from hyj_admin
+        where email = #{email}
+          and del_flag = 0
+    </select>
+</mapper>

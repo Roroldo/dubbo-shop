@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.topband.shop.provider.mapper.AdminRoleMapper">
+
+    <insert id="save">
+        insert into hyj_admin_role(id, admin_id, role_id, create_time, update_time) 
+        value (#{id}, #{adminId}, #{roleId}, #{createTime}, #{updateTime})
+    </insert>
+
+    <update id="updateByAdminId">
+        update hyj_admin_role set role_id = #{roleId}, update_time = #{updateTime} where admin_id = #{adminId}
+    </update>
+
+    <select id="selectByAdminId" resultType="com.topband.shop.entity.Role">
+        select hr.name, hr.id
+        from hyj_admin_role har
+                 left join hyj_role hr on hr.id = har.role_id
+        where har.admin_id = #{adminId}
+          and har.del_flag = 0
+    </select>
+
+    <select id="selectByRoleId" resultType="java.lang.Integer">
+        select count(*) from hyj_admin_role where role_id = #{roleId} and del_flag = 0
+    </select>
+</mapper>

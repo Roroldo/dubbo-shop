@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.topband.shop.provider.mapper.UserMapper">
+    <sql id="baseUserCol">
+        id
+        , email, password, create_time, update_time, del_flag
+    </sql>
+
+    <insert id="save" parameterType="com.topband.shop.entity.User">
+        insert into hyj_user(id, email, password, create_time, update_time)
+            value (#{id}, #{email}, #{password}, #{createTime}, #{updateTime})
+    </insert>
+
+    <select id="selectById" resultType="com.topband.shop.entity.User">
+        select
+        <include refid="baseUserCol"/>
+        from hyj_user
+        where id = #{userId}
+        and del_flag = 0
+    </select>
+
+    <select id="countByEmail" resultType="int">
+        select count(*)
+        from hyj_user
+        where email = #{email}
+        and del_flag = 0
+    </select>
+
+    <select id="selectByEmail" resultType="com.topband.shop.entity.User">
+        select
+        <include refid="baseUserCol"/>
+        from hyj_user where email = #{email}
+        and del_flag = 0
+    </select>
+</mapper>

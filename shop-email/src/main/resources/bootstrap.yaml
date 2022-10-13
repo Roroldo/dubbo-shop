@@ -1,0 +1,10 @@
+spring:
+  application:
+    name: hyj-shop-email
+  cloud:
+    nacos:
+      config:
+        server-addr: 192.168.26.119:8848,192.168.26.120:8848,192.168.26.121:8848
+#        file-extension: yaml
+#        namespace: ddbf5fa9-db88-42f6-9b17-5d126289482a
+#        group: dev

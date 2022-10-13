@@ -1,0 +1,27 @@
+spring:
+  logstash:
+    addr: 192.168.26.166.5044
+  mail:
+    default-encoding: UTF-8
+    host: smtp.163.com
+    # 记得设置协议，否则邮件会发送不出去
+    protocol: smtp
+    username: mt807301586@163.com
+    password: XNPJJAJWJOMDPNVN
+
+
+  rabbitmq:
+    addresses: 192.168.26.119:5672,192.168.26.120:5672,192.168.26.121:5672
+    username: guest
+    password: guestYUH6@#
+    host: /
+
+shop:
+  mail:
+    from: ${spring.mail.username}(topband_shop_hyj)
+    subject: topband-shop 验证码
+server:
+  port: 8482
+
+logging:
+  config: classpath:logs/logback.xml

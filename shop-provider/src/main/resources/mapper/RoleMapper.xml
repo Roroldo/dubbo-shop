@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.topband.shop.provider.mapper.RoleMapper">
+    <sql id="baseRoleCol">
+        id
+        , `name`, create_admin_id, create_time, update_time, del_flag
+    </sql>
+
+    <insert id="save">
+        insert into hyj_role(id, `name`, create_admin_id, create_time, update_time) value (#{id}, #{name}, #{createAdminId}, #{createTime}, #{updateTime})
+    </insert>
+
+    <update id="deleteById">
+        update hyj_role
+        set del_flag    = 1,
+            update_time = #{updateTime}
+        where id = #{roleId}
+    </update>
+
+    <update id="updateById">
+        update hyj_role
+        set name        = #{name},
+            update_time = #{updateTime}
+        where id = #{id}
+    </update>
+
+    <select id="selectById" resultType="com.topband.shop.entity.Role">
+        select
+        <include refid="baseRoleCol"/>
+        from hyj_role where id = #{roleId} and del_flag = 0
+    </select>
+
+    <select id="selectRoleForAdd" resultType="com.topband.shop.entity.Role">
+        select
+        <include refid="baseRoleCol"/>
+        from hyj_role
+        where del_flag = 0
+        and name != '超级管理员'
+    </select>
+
+    <select id="list" resultType="com.topband.shop.view.RoleVO">
+        select hr.id, hr.name, hr.create_time, ha.name as createAdminName
+        from hyj_role hr
+        left join hyj_admin ha on ha.id = hr.create_admin_id
+        <where>
+            <if test="roleName != null and roleName !=''">
+                hr.name like concat('%', #{roleName}, '%')
+            </if>
+            and hr.del_flag = 0
+        </where>
+        order by hr.order desc , hr.create_time desc
+    </select>
+
+    <select id="countByRoleName" resultType="java.lang.Integer">
+        select count(*)
+        from hyj_role
+        where name = #{roleName}
+          and del_flag = 0
+    </select>
+
+    <select id="countByRepeatName" resultType="java.lang.Integer">
+        select count(*)
+        from hyj_role
+        where name = #{roleName}
+          and id != #{roleId}
+          and del_flag = 0
+    </select>
+
+    <select id="selectByName" resultType="com.topband.shop.entity.Role">
+        select
+        <include refid="baseRoleCol"/>
+        from hyj_role where name = #{roleName} and del_flag = 0
+    </select>
+</mapper>

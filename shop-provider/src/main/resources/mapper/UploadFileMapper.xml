@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.topband.shop.provider.mapper.UploadFileMapper">
+    <insert id="save">
+        insert into hyj_upload_file(id, admin_id, create_time, update_time, filename, upload_time, status)
+            value (#{id}, #{adminId}, #{createTime}, #{updateTime}, #{fileName}, #{uploadTime}, #{status})
+    </insert>
+
+    <update id="updateById">
+        update hyj_upload_file
+        set status     = #{status},
+            update_time= #{updateTime}
+        where id = #{id}
+    </update>
+
+    <select id="list" resultType="com.topband.shop.view.UploadFileVO">
+        select huf.id,
+               ha.name as adminName,
+               filename,
+               upload_time,
+               (case huf.status when 0 then '导入中' when 1 then '导入完成' end) as status
+        from hyj_upload_file huf
+        left join hyj_admin ha on huf.admin_id = ha.id
+        <where>
+            <if test="start != null">
+                upload_time >= #{start}
+            </if>
+            <if test="end != null">
+                and upload_time <![CDATA[<=]]> #{end}
+            </if>
+        </where>
+    </select>
+</mapper>

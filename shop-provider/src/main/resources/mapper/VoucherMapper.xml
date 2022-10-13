@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.topband.shop.provider.mapper.VoucherMapper">
+    <sql id="baseVoucherVOCol">
+        id
+        , expire_time, `count`, voucher_price, `name`
+    </sql>
+
+    <sql id="baseVoucherCol">
+        id
+        , expire_time, `count`, voucher_price, create_time, update_time, del_flag, `name`
+    </sql>
+
+    <insert id="save" parameterType="com.topband.shop.entity.Voucher">
+        insert into hyj_voucher( id
+                               , expire_time, `count`, voucher_price, create_time, update_time, `name`)
+            value (#{id}, #{expireTime}, #{count}, #{voucherPrice}, #{createTime}, #{updateTime}, #{name})
+    </insert>
+
+    <update id="updateById">
+        update hyj_voucher
+        set count = count - 1, update_time = #{updateTime}
+        where id = #{voucherId}
+          and count > 0
+          and del_flag = 0
+    </update>
+
+    <select id="list" resultType="com.topband.shop.view.VoucherVO">
+        select
+        <include refid="baseVoucherVOCol"/>
+        from hyj_voucher
+        <where>
+            <if test="start != null">
+                expire_time >= #{start}
+            </if>
+            <if test="end != null">
+                and expire_time <![CDATA[<=]]> #{end}
+            </if>
+            <if test="!isFindAll">
+                and expire_time >= current_timestamp
+            </if>
+            <if test="!isFindAll">
+                and `count` > 0
+            </if>
+            and del_flag = 0
+        </where>
+    </select>
+
+    <select id="countByName" resultType="java.lang.Integer">
+        select count(*)
+        from hyj_voucher
+        where `name` = #{voucherName}
+          and del_flag = 0
+    </select>
+
+    <select id="selectById" resultType="com.topband.shop.view.VoucherVO">
+        select
+        <include refid="baseVoucherVOCol"/>
+        from hyj_voucher
+        where id = #{voucherId}
+        and del_flag = 0
+    </select>
+</mapper>

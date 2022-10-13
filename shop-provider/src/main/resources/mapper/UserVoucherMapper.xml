@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.topband.shop.provider.mapper.UserVoucherMapper">
+    <insert id="save" parameterType="com.topband.shop.entity.UserVoucher">
+        insert into hyj_user_voucher(id, user_id, voucher_id, create_time, update_time)
+            value (#{id}, #{userId}, #{voucherId}, #{createTime}, #{updateTime})
+    </insert>
+
+    <update id="deleteByUserIdAndVoucherId">
+        update hyj_user_voucher
+        set del_flag    = 1,
+            update_time = #{updateTime}
+        where user_id = #{userId}
+          and voucher_id = #{voucherId}
+    </update>
+
+    <select id="countNotExpiredVoucher" resultType="java.lang.Integer">
+        select count(*)
+        from hyj_voucher
+        where id in (select voucher_id from hyj_user_voucher where del_flag = 0 and user_Id = #{userId})
+          and del_flag = 0
+          and expire_time >= current_timestamp
+    </select>
+
+    <select id="selectNotExpiredVoucherByUserId" resultType="com.topband.shop.view.VoucherVO">
+        select hv.id, hv.expire_time, hv.count, hv.voucher_price, hv.name
+        from hyj_voucher hv
+                 left join hyj_user_voucher huv on huv.voucher_id = hv.id
+        where huv.del_flag = 0
+          and hv.expire_time >= current_timestamp
+          and huv.user_id = #{user_id}
+    </select>
+</mapper>

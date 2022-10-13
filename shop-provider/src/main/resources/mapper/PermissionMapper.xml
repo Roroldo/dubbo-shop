@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.topband.shop.provider.mapper.PermissionMapper">
+
+    <select id="list" resultType="com.topband.shop.view.PermissionVO">
+        select id, name, url, parent_id, `type`, `order`
+        from hyj_permission
+        <where>
+            <if test="roleId != null">
+                id in (select permission_id from hyj_role_permission where role_id = #{roleId} and del_flag = 0)
+            </if>
+            and del_flag = 0
+        </where>
+        order by `type`, `order`
+    </select>
+</mapper>

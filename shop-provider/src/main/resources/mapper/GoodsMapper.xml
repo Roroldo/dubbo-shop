@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.topband.shop.provider.mapper.GoodsMapper">
+    <sql id="baseGoodsCol">
+        id
+        , category, image_url, `name`, goods_price, total
+    </sql>
+
+    <update id="updateTotalById">
+        update hyj_goods
+        set total       = total - 1,
+            update_time = #{updateTime}
+        where id = #{goodsId}
+    </update>
+
+    <update id="updateById">
+        update hyj_goods
+        <set>
+            <if test="imageUrl != null">
+                image_url = #{imageUrl},
+            </if>
+            <if test="name != null">
+                `name` = #{name},
+            </if>
+            <if test="category != null">
+                category = #{category},
+            </if>
+            <if test="updateTime != null">
+                update_time = #{updateTime},
+            </if>
+        </set>
+        where del_flag = 0 and id = #{id}
+    </update>
+
+    <update id="deleteById">
+        update hyj_goods set del_flag = 1, update_time = #{updateTime} where id = #{goodsId}
+    </update>
+
+    <select id="list" resultType="com.topband.shop.view.GoodsVO">
+        select
+        <include refid="baseGoodsCol"/>
+        from hyj_goods
+        <where>
+            <if test="goodsName != null and goodsName != ''">
+                `name` like concat(#{goodsName}, '%')
+            </if>
+            and del_flag = 0
+        </where>
+    </select>
+
+    <select id="selectById" resultType="com.topband.shop.view.GoodsVO">
+        select
+        <include refid="baseGoodsCol"/>
+        from hyj_goods
+        where id = #{goodsId}
+        and del_flag = 0
+    </select>
+
+    <select id="countByName" resultType="java.lang.Integer">
+        select count(*)
+        from hyj_goods
+        <where>
+            <if test="id != null">
+                id != #{id}
+            </if>
+            and `name` = #{name} and del_flag = 0
+        </where>
+    </select>
+
+    <insert id="saveBatch">
+        insert ignore into hyj_goods(id, `name`, goods_price, total, create_time, update_time)
+        values
+        <foreach collection="cacheGoodsSet" separator="," item="goods">
+            (#{goods.id}, #{goods.name}, #{goods.goodsPrice}, #{goods.total},
+            #{goods.createTime}, #{goods.updateTime})
+        </foreach>
+    </insert>
+
+    <select id="countByCategory" resultType="java.lang.Integer">
+        select count(*)
+        from hyj_goods
+        <where>
+            <if test="id != null">
+                id != #{id}
+            </if>
+            and category = #{category} and del_flag = 0
+        </where>
+    </select>
+
+    <insert id="save" parameterType="com.topband.shop.entity.Goods">
+        insert into hyj_goods(id, `name`, category, goods_price, total, image_url, create_time, update_time)
+            value (#{id}, #{name}, #{category}, #{goodsPrice}, #{total}, #{imageUrl}, #{createTime}, #{updateTime})
+    </insert>
+</mapper>

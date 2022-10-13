@@ -1,0 +1,78 @@
+server:
+  port: 9798
+
+logging:
+  config: classpath:logs/logback.xml
+  level:
+    - com.topband.shop.provider.mapper: debug
+
+dubbo:
+  registry:
+    address: zookeeper://192.168.26.119:2181?backup=192.168.26.120:2181,192.168.26.121:2181
+  application:
+    name: hyj-shop-provider-app
+  protocol:
+    port: 20888
+
+spring:
+  logstash:
+    addr: 192.168.26.166.5044
+  profiles:
+    active:
+      -dev
+  messages:
+    basename: i18n/messages
+    encoding: UTF-8
+    cache-duration: 3600s
+    fallback-to-system-locale: true
+  datasource:
+    druid:
+      driver-class-name: com.mysql.jdbc.Driver
+      url: jdbc:mysql://192.168.3.64:3306/huangyijun?useSSL=false
+      username: huangyijun
+      password: Aac123456
+  redis:
+    cluster:
+      nodes:
+        - 192.168.26.119:7000
+        - 192.168.26.119:7001
+        - 192.168.26.120:7000
+        - 192.168.26.120:7001
+        - 192.168.26.121:7000
+        - 192.168.26.121:7001
+    ssl: false
+    password: redisBNH76@#y
+    database: 0
+    lettuce:
+      pool:
+        max-active: 16
+        max-idle: 16
+        max-wait: -1ms
+        min-idle: 0
+
+mybatis:
+  mapper-locations: classpath:mapper/*.xml
+  # 开启驼峰映射
+  configuration:
+    map-underscore-to-camel-case: true
+    #  configuration:
+    #    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
+
+# mybatis分页插件
+pagehelper:
+  # 数据库方言
+  helper-dialect: mysql
+  # 当设置为true的时候，如果pagesize设置为0（或RowBounds的limit=0），就不执行分页，返回全部结果
+  page-size-zero: false
+  # 默认值为 false ，该参数对使用 RowBounds 作为分页参数时有效。 当该参数设置为 true 时，会将 RowBounds 中的 offset 参数当成 pageNum 使用，可以用页码和页面大小两个参数进行分页
+  offset-as-page-num: false
+  # 默认值为false，该参数对使用RowBounds作为分页参数时有效。当该参数设置为 true 时，使用 RowBounds 分页会进行 count 查询。
+  row-bounds-with-count: true
+  # 分页合理化参数，默认值为 false。当该参数设置为 true 时， pageNum<=0 时会查询第一页， pageNum>pages （超过总数时），会查询最后一页。默认 false 时，直接根据参数进行查询。
+  reasonable: true
+  # 支持通过 Mapper 接口参数来传递分页参数，默认值 false ，分页插件会从查询方法的参数值中，自动根据params配置的字段中取值，查找到合适的
+  # 值时就会自动分页
+  support-methods-arguments: true
+  # 为了支持startPage(Object params)方法，增加了该参数来配置参数映射，用于从对象中根据属性名取值，可以配置pageNum,pageSize,count,pageSizeZero,reasonable ，
+  # 不配置映射的用默认值，默认值为 pageNum=pageNum;pageSize=pageSize;count=countSql;reasonable=reasonable;pageSizeZero= pageSizeZero
+  params: count:countSql
